@@ -1,8 +1,5 @@
 flask
 pillow
-qrcode
-gunicorn
-opencv-python-headless
-numpy
 pyzbar
 requests
+gunicorn
