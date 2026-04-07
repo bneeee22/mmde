@@ -3,95 +3,105 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QR Safe - فاحص الروابط الذكي</title>
+    <title>QR Code Scan</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+    
     <style>
         body { font-family: 'Tajawal', sans-serif; }
-        .glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
+        
+        /* حركة الظهور التدريجي للنظام */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fadeInUp { animation: fadeInUp 0.5s ease-out forwards; }
+
+        /* دائرة الانتظار (Loader) */
+        .loader {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3b82f6;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
-<body class="bg-slate-50 min-h-screen flex items-center justify-center p-4">
+<body class="bg-[#F8FAFC] min-h-screen flex items-center justify-center p-4">
 
-    <div class="max-w-md w-full glass rounded-[2.5rem] shadow-2xl overflow-hidden border border-white relative">
-        
-        <div class="p-8 text-center bg-gradient-to-tr from-indigo-600 via-blue-600 to-cyan-500 relative overflow-hidden">
-            <div class="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
-                <svg viewBox="0 0 100 100" class="w-full h-full"><path d="M0 0h100v100H0z" fill="url(#p)"/><defs><pattern id="p" patternUnits="userSpaceOnUse" width="10" height="10"><path d="M0 0h1v1H0z" fill="#fff"/></pattern></defs></svg>
-            </div>
+    <div class="max-w-xl w-full mx-auto animate-fadeInUp">
+        <div class="bg-white rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-slate-100 overflow-hidden">
             
-            <div class="inline-flex items-center justify-center w-20 h-20 bg-white/20 rounded-3xl backdrop-blur-md mb-4 shadow-lg">
-                <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-                </svg>
+            <div class="p-8 text-center border-b border-slate-50">
+                <div class="bg-blue-50 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-inner">
+                    <svg class="w-8 h-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4v1m0 11v1m5-10v1m-10 0v1m10 5v1m-10 0v1m-2-4h14M5 8h14m-14 4h14m-14 4h14"></path>
+                    </svg>
+                </div>
+                <h1 class="text-2xl font-extrabold text-slate-900">QR Code Scan</h1>
+                <p class="text-slate-400 mt-1 text-sm">فحص سريع وآمن لرموز الـ QR</p>
             </div>
-            <h1 class="text-3xl font-extrabold text-white tracking-tight">QR Safe</h1>
-            <p class="text-blue-100/80 text-sm mt-1">حمايتك تبدأ من مسح الرمز</p>
-        </div>
 
-        <div class="p-8">
-            {% if not status %}
-            <form action="/scan" method="post" enctype="multipart/form-data" class="space-y-6">
-                <div class="group relative">
-                    <label class="flex flex-col items-center justify-center p-10 bg-slate-50 text-blue-600 rounded-3xl border-2 border-dashed border-blue-100 cursor-pointer hover:bg-blue-50 hover:border-blue-300 transition-all duration-300 group">
-                        <div class="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-sm">
-                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+            <div class="p-8 md:p-10">
+                {% if not result %}
+                <form action="/scan" method="post" enctype="multipart/form-data">
+                    <label class="group flex flex-col items-center justify-center p-12 bg-slate-50 text-blue-600 rounded-[2rem] border-2 border-dashed border-blue-100 cursor-pointer hover:bg-blue-100/50 hover:border-blue-400 transition-all duration-300">
+                        <div id="upload-icon" class="mb-4 transform group-hover:scale-110 transition-transform">
+                            <svg class="w-12 h-12 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+                            </svg>
                         </div>
-                        <span class="font-bold text-slate-700">اضغط لرفع صورة QR</span>
-                        <p class="text-xs text-slate-400 mt-2 italic">سيتم الفحص فورياً عبر VirusTotal</p>
-                        <input type="file" name="file" class="hidden" required onchange="this.form.submit()">
+                        <div id="loader" class="hidden mb-4"><div class="loader"></div></div>
+                        <span class="text-slate-700 font-bold">اختر صورة الكود</span>
+                        <input type="file" name="file" class="hidden" required onchange="startLoading(this)">
                     </label>
-                </div>
-            </form>
+                </form>
 
-            {% elif status == 'safe' %}
-            <div class="text-center animate-in fade-in duration-500">
-                <div class="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm">
-                    <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                {% elif result == 'safe' %}
+                <div class="text-center animate-fadeInUp">
+                    <div class="w-20 h-20 bg-green-50 text-green-500 rounded-full flex items-center justify-center mx-auto mb-5 text-4xl shadow-inner shadow-green-100">✓</div>
+                    <h2 class="text-xl font-extrabold text-green-700">الرمز آمن</h2>
+                    <div class="my-5 p-4 bg-slate-50 rounded-2xl border border-slate-100 text-right">
+                        <p class="text-[10px] text-slate-400 mb-1 uppercase font-bold tracking-widest">المحتوى</p>
+                        <p class="text-slate-600 break-all text-sm leading-relaxed font-medium">{{ content }}</p>
+                    </div>
                 </div>
-                <h2 class="text-2xl font-bold text-slate-800">الرابط آمن</h2>
-                <div class="my-6 p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                    <p class="text-slate-500 break-all text-sm leading-relaxed">{{ url }}</p>
+
+                {% elif result == 'danger' %}
+                <div class="text-center animate-fadeInUp">
+                    <div class="w-20 h-20 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-5 text-4xl shadow-inner shadow-red-100 animate-pulse font-bold italic">!</div>
+                    <h2 class="text-xl font-extrabold text-red-600">تحذير: الرمز خطير</h2>
+                    <div class="my-5 p-4 bg-red-50 rounded-2xl border border-red-100 text-right">
+                        <p class="text-red-700 break-all text-sm font-medium italic">{{ content }}</p>
+                    </div>
+                    <div class="bg-red-600 text-white px-5 py-2 rounded-xl inline-block text-xs font-black shadow-lg shadow-red-200">
+                        اكتشفه {{ count }} محرك أمني!
+                    </div>
+                {% endif %}
+
+                {% if result %}
+                <div class="mt-8 pt-6 border-t border-slate-50 text-center">
+                    <a href="/" class="text-blue-600 font-bold hover:text-blue-800 transition-colors inline-flex items-center text-sm">
+                        <svg class="w-4 h-4 ml-2 rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                        فحص كود جديد
+                    </a>
                 </div>
-                <p class="text-sm text-green-600 font-medium">اجتاز فحص الأمان بنجاح بنسبة 100%</p>
+                {% endif %}
             </div>
-
-            {% elif status == 'danger' %}
-            <div class="text-center animate-bounce duration-1000">
-                <div class="w-20 h-20 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-red-100 shadow-lg">
-                    <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
-                </div>
-                <h2 class="text-2xl font-bold text-red-600">تحذير: رابط ملغوم!</h2>
-                <div class="my-6 p-4 bg-red-50 rounded-2xl border border-red-100">
-                    <p class="text-red-700 break-all text-sm italic">{{ url }}</p>
-                </div>
-                <div class="bg-red-600 text-white py-2 px-4 rounded-xl inline-block font-bold">
-                    خطر! اكتشفه {{ count }} محرك أمني
-                </div>
-
-            {% elif status == 'info' %}
-            <div class="text-center">
-                <div class="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 italic text-2xl">i</div>
-                <h2 class="text-xl font-bold text-slate-800">هذا الرمز يحتوي نصاً</h2>
-                <div class="mt-4 p-5 bg-slate-50 rounded-2xl text-slate-600 text-right leading-relaxed border border-slate-100">
-                    {{ text }}
-                </div>
-            </div>
-            {% endif %}
-
-            {% if status %}
-            <div class="mt-10 pt-6 border-t border-slate-100 flex justify-center">
-                <a href="/" class="text-indigo-600 font-bold hover:text-indigo-800 transition-colors flex items-center">
-                    <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 12H5m7 7l-7-7 7-7"></path></svg>
-                    فحص كود آخر
-                </a>
-            </div>
-            {% endif %}
         </div>
     </div>
 
-    <div class="fixed bottom-6 text-slate-400 text-xs text-center w-full">
-        &copy; 2026 QR Safe - مدعوم بتقنيات VirusTotal
-    </div>
+    <script>
+        // إظهار حركة التحميل فور اختيار الملف
+        function startLoading(input) {
+            if (input.files.length > 0) {
+                document.getElementById('upload-icon').classList.add('hidden');
+                document.getElementById('loader').classList.remove('hidden');
+                input.form.submit();
+            }
+        }
+    </script>
 </body>
 </html>
