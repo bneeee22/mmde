@@ -7,7 +7,7 @@ import io
 app = Flask(__name__)
 
 
-VT_API_KEY = "2fc2b9c1c6e02bebc1b0842a698e43b8b5de41b625e41d71f5d1637911fbf699"
+VT_API_KEY = "2418816e8877bcf35b0ae83c0b2b616234cda6619e913b740266aafecee8581d"
 
 def check_with_virustotal(url):
     """دالة الاتصال بـ VirusTotal للحصول على نتيجة الفحص الحقيقية"""
